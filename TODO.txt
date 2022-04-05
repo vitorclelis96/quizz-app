@@ -1,3 +1,4 @@
 Separar a tipagem em um folder types/$FOO.d.ts
-Handle error cases. (Home page)
 Melhorar o store.
+
+UNSUBSCRIBE PODE SER UM HOOK

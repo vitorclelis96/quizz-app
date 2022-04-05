@@ -49,18 +49,21 @@ const useQuizzStore = create<UseQuizzStoreType>(set => ({
             }));
             const res = await fetch('https://opentdb.com/api.php?amount=10&difficulty=hard&type=boolean');
             const jsonData = await res.json() as QuizzApiResponse;
-            set({ questions: jsonData.results.map(r => ({
-                ...r,
-                uuid: v4(),
-                question: he.decode(r.question),
-            }))});
             set(state => {
                 state.questionCount = 0;
                 state.currentQuestion = state.questions[0];
+
+                state.quizzIsOver = false;
+
+                state.questions = jsonData.results.map(r => ({
+                    ...r,
+                    uuid: v4(),
+                    question: he.decode(r.question),
+                }));
+
+                state.currentQuestion = state.questions[0];
+
                 return { ...state };
-            });
-            set({
-                quizzIsOver: false,
             });
         } catch (error) {
             set({ error: true });

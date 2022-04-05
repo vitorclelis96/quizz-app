@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import MainText from '../components/MainText';
 import ScreenWrapper from '../components/ScreenWrapper';
 import StandardButton from '../components/StandardButton';
@@ -31,14 +31,24 @@ const styles = StyleSheet.create({
 })
 
 export default function Home({ navigation}: Props) {
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const newGame = useQuizzStore(state => state.newGame);
 
     const navigateToQuizzBegin = async () => {
-        setIsLoading(true);
-        await newGame();
-        setIsLoading(false);
-        navigation.navigate('Quizz');
+        try {
+            setIsLoading(true);
+            await newGame();
+            setIsLoading(false);
+            navigation.navigate('Quizz');
+        } catch (error) {
+            // console.log(error);
+            setErrorMessage('Something went wrong while fetching quizz api');
+        }
+    }
+
+    if (errorMessage !== '') {
+        Alert.alert('Error', errorMessage);
     }
 
     return (

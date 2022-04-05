@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Text } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 import Home from '../screens/Home';
 import Quizz from '../screens/Quizz';
@@ -20,7 +19,7 @@ type MainNavigationScreen = {
     children?: JSX.Element,
 }
 
-const defaultScreenOpts = {
+const defaultScreenOpts: NativeStackNavigationOptions = {
     headerShown: false,
 }
 
