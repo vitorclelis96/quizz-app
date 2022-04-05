@@ -49,10 +49,10 @@ export default function Quizz({ navigation }: Props) {
     }, [quizzIsOver]);
 
     useEffect(() => {
-        navigation.addListener('beforeRemove', (e) => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
             Alert.alert(
-                'Keep playing?',
+                'Quit?',
                 "You're still playing, are you sure you wanna go back and quit?",
                 [
                     { text: "No", style: 'cancel', onPress: () => {} },
@@ -61,15 +61,10 @@ export default function Quizz({ navigation }: Props) {
                 {
                     cancelable: true,
                 }
-            );
-        })
-    }, [navigation])
-
-    const wrap = (el: React.ReactNode) => (
-        <ScreenWrapper>
-        {el}
-        </ScreenWrapper>
-    );
+            )
+        });
+        return unsubscribe;
+    }, [navigation]);
 
     const AnswerButton = (text: string, onPress: () => void) => {
         return (
@@ -86,18 +81,14 @@ export default function Quizz({ navigation }: Props) {
         answerQuestion(currentQuestion.uuid, answer);
         nextQuestion();
     }
-
-    if (!currentQuestion) {
-        return wrap(<StandardText>Loading</StandardText>);
-    }
     
     return (
         <ScreenWrapper style={{justifyContent: 'space-between'}}>
             <View>
-            <StandardText>{currentQuestion.category}</StandardText>
+            <StandardText>{currentQuestion!.category}</StandardText>
             </View>
             <View>
-            <MainText style={styles.box}>{currentQuestion.question}</MainText>
+            <MainText style={styles.box}>{currentQuestion!.question}</MainText>
             {
                 questionCount !== undefined && (
                     <StandardText style={styles.marginBottom}>{`Question ${(questionCount + 1)}/10`}</StandardText>

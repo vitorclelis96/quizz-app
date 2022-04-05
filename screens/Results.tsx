@@ -6,10 +6,11 @@ import useQuizzStore from "../hooks/useQuizzStore";
 import { MainStackParamList } from "../navigation/MainNavigation";
 import { AntDesign } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
-import { FlatList, StyleSheet, View } from "react-native";
+import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import Line from "../components/Line";
 import StandardButton from "../components/StandardButton";
 import { colors } from "../styles";
+import { useEffect } from "react";
 
 const styles = StyleSheet.create({
     text: {
@@ -31,10 +32,23 @@ const styles = StyleSheet.create({
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Results'>;
 
-export default function Results({ navigation }: Props) {
+export default function Results({ navigation, route }: Props) {
     const questions = useQuizzStore(state => state.questions);
 
-    const goToHome = () => navigation.popToTop();
+    const goToHome = () => {
+        if (route.name === 'Results') {
+            navigation.popToTop();
+            return true;
+        }
+        return false;
+    };
+
+    useEffect(() => {
+        BackHandler.addEventListener('hardwareBackPress', goToHome);
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', goToHome);
+        }
+    })
 
     const count = questions.reduce((p, c) => {
         if (c.userIsCorrect) {
