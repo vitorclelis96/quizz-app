@@ -1,0 +1,2 @@
+Separar a tipagem em um folder types/$FOO.d.ts
+Handle error cases.
