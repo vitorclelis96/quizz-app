@@ -1,21 +1,28 @@
 import create from 'zustand';
 import 'react-native-get-random-values';
 import { v4 } from 'uuid';
+import he from 'he';
 
 type UseQuizzStoreType = {
     questions: Array<QuizzQuestion>,
-    answers: Array<QuizzUserResponse>,
-    fetch: () => void,
+    newGame: () => Promise<void>,
     error: boolean,
+    currentQuestion?: QuizzQuestion,
+    questionCount?: number,
+    answerQuestion: (uuid: string, response: TrueOrFalse) => void,
+    nextQuestion: () => void,
+    quizzIsOver: boolean,
 }
 
-type TrueOrFalse = "True" | "False";
+export type TrueOrFalse = "True" | "False";
 
-type QuizzQuestion = {
+export type QuizzQuestion = {
     uuid: string,
     category: string,
     question: string,
     correct_answer: TrueOrFalse,
+    userResponse?: TrueOrFalse,
+    userIsCorrect?: boolean,
 }
 
 type QuizzApiResponse = {
@@ -23,47 +30,67 @@ type QuizzApiResponse = {
     results: QuizzQuestion[],
 }
 
-type QuizzUserResponse = {
-    uuid: string,
-    userResponse?: TrueOrFalse,
-    correctAnswer: TrueOrFalse,
-    userIsCorrect?: boolean,
-   
-}
-
-const useQuizzStore = create<UseQuizzStoreType>(set => ({
+const rawStore = {
     questions: [],
     answers: [],
     error: false,
-    fetch: async () => {
+    currentQuestion: undefined,
+    questionCount: undefined,
+    quizzIsOver: false,
+}
+
+const useQuizzStore = create<UseQuizzStoreType>(set => ({
+    ...rawStore,
+    newGame: async () => {
         try {
+            set(state => ({
+                ...state,
+                ...rawStore
+            }));
             const res = await fetch('https://opentdb.com/api.php?amount=10&difficulty=hard&type=boolean');
             const jsonData = await res.json() as QuizzApiResponse;
             set({ questions: jsonData.results.map(r => ({
                 ...r,
                 uuid: v4(),
+                question: he.decode(r.question),
             }))});
-            set({ answers: jsonData.results.map(r => ({
-                uuid: r.uuid,
-                correctAnswer: r.correct_answer,
-            }))});
+            set(state => {
+                state.questionCount = 0;
+                state.currentQuestion = state.questions[0];
+                return { ...state };
+            });
+            set({
+                quizzIsOver: false,
+            });
         } catch (error) {
             set({ error: true });
         }
     },
     answerQuestion: (uuid: string, response: TrueOrFalse) => {
         set(state => {
-            state.answers = state.answers.map(a => {
-                if (a.uuid === uuid) {
+            state.questions = state.questions.map(q => {
+                if (q.uuid === uuid) {
                     return {
-                        ...a,
+                        ...q,
                         userResponse: response,
-                        userIsCorrect: response === a.correctAnswer,
+                        userIsCorrect: response === q.correct_answer,
                     }
                 }
-                return a;
+                return { ...q };
             });
-            return state;
+            return { ...state };
+        });
+    },
+    nextQuestion: () => {
+        set(state => {
+            const nextQuestion = state.questions.find((q) => !q.userResponse);
+            if (!nextQuestion) {
+                state.quizzIsOver = true;
+                return { ...state }
+            }
+            state.currentQuestion = nextQuestion;
+            state.questionCount = (state.questionCount || 0) + 1;
+            return { ...state };
         })
     },
 }));

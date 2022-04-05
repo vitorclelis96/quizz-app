@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './screens/Home';
 import MainNavigation from './navigation/MainNavigation';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 // import Home from '../screens/Home';
 
@@ -12,9 +13,11 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <MainNavigation>
-      <StatusBar style="auto" />
-    </MainNavigation>
+    <SafeAreaProvider>
+      <MainNavigation>
+        <StatusBar style="auto" />
+      </MainNavigation>
+    </SafeAreaProvider>
   );
 }
 

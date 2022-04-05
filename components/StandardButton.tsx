@@ -15,11 +15,12 @@ type StandardButtonProps = {
     buttonStyle?: StyleProp<ViewStyle>,
     textStyle?: StyleProp<TextStyle>,
     onPress: (event: GestureResponderEvent) => void
+    disabled?: boolean
 }
 
-export default function StandardButton({ children, buttonStyle, textStyle, onPress }: StandardButtonProps) {
+export default function StandardButton({ disabled, children, buttonStyle, textStyle, onPress }: StandardButtonProps) {
     return (
-        <TouchableOpacity style={[styles.default, buttonStyle]} onPress={onPress}>
+        <TouchableOpacity disabled={disabled} style={[styles.default, buttonStyle]} onPress={onPress}>
             <StandardText style={textStyle}>{children}</StandardText>
         </TouchableOpacity>
     )

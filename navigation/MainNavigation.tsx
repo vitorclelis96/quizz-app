@@ -2,13 +2,16 @@ import * as React from 'react';
 import { Text } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Home from '../screens/Home';
 import Quizz from '../screens/Quizz';
+import Results from '../screens/Results';
 
 export type MainStackParamList = {
     Home: undefined,
     Quizz: undefined,
+    Results: undefined,
 }
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -24,16 +27,18 @@ const defaultScreenOpts = {
 export default function MainNavigation({ children }: MainNavigationScreen) {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName='Home'>
+            <Stack.Navigator screenOptions={defaultScreenOpts} initialRouteName='Home'>
                 <Stack.Screen
                     name="Home"
                     component={Home}
-                    options={defaultScreenOpts}
                 />
                 <Stack.Screen
                     name="Quizz"
                     component={Quizz}
-                    options={defaultScreenOpts}
+                />
+                <Stack.Screen
+                    name="Results"
+                    component={Results}
                 />
             </Stack.Navigator>
             {children && children}
